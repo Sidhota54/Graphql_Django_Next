@@ -9,19 +9,29 @@ from app.models import Store
 class StoreType(DjangoObjectType):
     class Meta:
         model = Store
-        fields = ("id" , "store_name" , "store_logo" , "admin_mail")
+        fields = ("id" , "store_name" , "store_logo" ,"store_url", "admin_mail")
 
 class StoreQuery(graphene.ObjectType):
     all_store = graphene.List(StoreType)
-       
+    store_by_id = graphene.Field(StoreType, id=graphene.String())
+ 
     def resolve_all_store(root,info):
+        # Querying all Store
         return Store.objects.all()
+    def resolve_store_by_id(root, info, id):
+         # Querying a single Store
+        return Store.objects.get(pk=id)
+
+   
+   
+   
 
 class CreateStore(graphene.Mutation):
     class Arguments:
         store_name = graphene.String()
         store_logo = graphene.String()
         admin_mail = graphene.String()
+        store_url = graphene.String()
         
     store = graphene.Field(StoreType)
     
@@ -30,7 +40,8 @@ class CreateStore(graphene.Mutation):
         store = Store(
             store_name = store_data.get("store_name"),
             store_logo = store_data.get("store_logo"),
-            admin_mail = store_data.get("admin_mail")
+            admin_mail = store_data.get("admin_mail"),
+            store_url = store_data.get("store_url"),
         )
         store.save()
         return CreateStore(store = store)
@@ -41,7 +52,7 @@ class StoreMutation(graphene.ObjectType):
 class DeleteStore(graphene.Mutation):
     class Arguments:
         id = graphene.ID()
-        
+    
     store = graphene.Field(StoreType)
     
     @classmethod
@@ -49,9 +60,12 @@ class DeleteStore(graphene.Mutation):
         store = Store.objects.get(id=id)
         store.delete()
         return DeleteStore(store)
-    
+
+
+
 class DeleteStoreMutation(graphene.ObjectType):
     delete_store = DeleteStore.Field()
+
 
 class UpdateStore(graphene.Mutation):
     class Arguments:
@@ -59,7 +73,8 @@ class UpdateStore(graphene.Mutation):
         store_name = graphene.String() 
         store_logo = graphene.String() 
         admin_mail = graphene.String()  
-    
+        store_url = graphene.String()
+        
     store = graphene.Field(StoreType)  
     
     @classmethod
@@ -75,6 +90,8 @@ class UpdateStore(graphene.Mutation):
 class UpdateStoreMutation(graphene.ObjectType):
     create_store = CreateStore.Field()
     update_store = UpdateStore.Field()
+
+
 #COLUMN QUERY & MUTATION (CRUD)
 
 class ColumnsType(DjangoObjectType):
@@ -146,18 +163,20 @@ class UpdateColumnMutation(graphene.ObjectType):
     update_column = UpdateColumns.Field()
      
 class Query(
+  
     StoreQuery,
     ColumnQuery
 ):
     pass  
 
 class Mutation(
+   
    StoreMutation,
    ColumnMutation,
    DeleteStoreMutation,
    DeleteColumnMutation,
    UpdateStoreMutation,
-   UpdateColumnMutation 
+   UpdateColumnMutation ,
 ):
     pass
 

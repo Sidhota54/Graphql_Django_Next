@@ -3,20 +3,20 @@ from django.db import models
 
 class Store(models.Model):
     store_name = models.CharField(max_length = 100)
-    # store_url = models.Charfield(max_length = 100)
+    store_url = models.URLField(max_length=200)
     store_logo = models.ImageField(upload_to = "images")
     admin_mail = models.CharField(max_length = 100)
     # default = models.BooleanField()
     
-    def store(self):
-        self.save()
+    def __str__(self):
+        return self.store_name
     
 class Columns(models.Model):
     name = models.CharField(max_length = 100)
     value = models.IntegerField(default=0)
     
-    def columns(self):
-        self.save()
+    def __str__(self):
+        return self.name
         
 class Products(models.Model):
     column_id = models.ForeignKey(Columns, on_delete=models.CASCADE)
