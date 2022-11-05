@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-
+from graphql_auth.schema import UserQuery, MeQuery
 from app.models import Columns
 from app.models import Store
 
@@ -21,11 +21,7 @@ class StoreQuery(graphene.ObjectType):
     def resolve_store_by_id(root, info, id):
          # Querying a single Store
         return Store.objects.get(pk=id)
-
-   
-   
-   
-
+        
 class CreateStore(graphene.Mutation):
     class Arguments:
         store_name = graphene.String()
@@ -47,7 +43,7 @@ class CreateStore(graphene.Mutation):
         return CreateStore(store = store)
 
 class StoreMutation(graphene.ObjectType):
-    create_store = CreateStore.Field()
+    Create_store = CreateStore.Field()
 
 class DeleteStore(graphene.Mutation):
     class Arguments:
@@ -128,6 +124,7 @@ class ColumnMutation(graphene.ObjectType):
 class DeleteColumns(graphene.Mutation):
     class Arguments:
         id = graphene.ID()
+        message = graphene.String()
         
     columns = graphene.Field(ColumnsType)
     
@@ -163,7 +160,9 @@ class UpdateColumnMutation(graphene.ObjectType):
     update_column = UpdateColumns.Field()
      
 class Query(
-  
+    UserQuery,
+    MeQuery,
+    graphene.ObjectType,
     StoreQuery,
     ColumnQuery
 ):

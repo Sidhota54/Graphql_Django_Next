@@ -1,6 +1,8 @@
 from multiprocessing.sharedctypes import Value
 from django.db import models
 
+
+
 class Store(models.Model):
     store_name = models.CharField(max_length = 100)
     store_url = models.URLField(max_length=200)
